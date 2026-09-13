@@ -17,7 +17,7 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Pinky Promise — Bridal Shower",
   description: "A little pink, a lot of love, one forever promise.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinky-promise-150926.soft-tang-8386.chatgpt.site"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinky-promise-150926.jamess11.chatgpt.site"),
   robots: {
     index: false,
     follow: false,
