@@ -61,25 +61,24 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
           justifyContent: "center",
         }}
       >
-        {/* Guaranteed base sticker face from master sprite sheet */}
-        <div
-          className="sticker-base-sprite"
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "url('/images/the-girls-stickers.png')",
-            backgroundSize: "300% 200%",
-            backgroundPosition: spriteFallbackPositions[index % 6],
-            backgroundRepeat: "no-repeat",
-            pointerEvents: "none",
-            userSelect: "none",
-            zIndex: 1,
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Animated expression frame overlay */}
-        {!hasError && (
+        {hasError ? (
+          /* Fallback single face from master sprite sheet if frame fails */
+          <div
+            className="sticker-base-sprite"
+            style={{
+              width: "100%",
+              height: "100%",
+              backgroundImage: "url('/images/the-girls-stickers.png')",
+              backgroundSize: "300% 200%",
+              backgroundPosition: spriteFallbackPositions[index % 6],
+              backgroundRepeat: "no-repeat",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+            aria-hidden="true"
+          />
+        ) : (
+          /* Clean single animated sticker image */
           <img
             src={currentFrameSrc}
             alt={`Bestie expression ${index + 1}`}
@@ -91,8 +90,6 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
             height={360}
             onError={() => setHasError(true)}
             style={{
-              position: "relative",
-              zIndex: 2,
               display: "block",
               width: "100%",
               height: "100%",
