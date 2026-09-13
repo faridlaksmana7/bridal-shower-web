@@ -1,6 +1,35 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Alex+Brush&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 
+@font-face {
+  font-family: "Luxia";
+  src: url("/assets/Luxia-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Luxia";
+  src: url("/assets/Luxia-Display.otf") format("opentype");
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Luxia Display";
+  src: url("/assets/Luxia-Display.otf") format("opentype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: "Luxia", "Plus Jakarta Sans", Arial, sans-serif;
+  --font-display: "Luxia Display", "Luxia", "Fraunces", Georgia, serif;
+}
+
 :root {
   --porcelain: #fff9f8;
   --powder: #fce4ed;
@@ -12,8 +41,8 @@
   --active-pink: #ff8fbd;
   --background: var(--porcelain);
   --foreground: var(--plum);
-  --font-display: var(--font-fraunces), "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-jakarta), Arial, Helvetica, sans-serif;
+  --font-display: "Luxia Display", "Luxia", var(--font-fraunces), "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Luxia", var(--font-jakarta), Arial, Helvetica, sans-serif;
   --font-script: var(--font-pinyon), var(--font-alex), "Pinyon Script", "Alex Brush", cursive;
 }
 
@@ -22,13 +51,14 @@ html {
   background: #1a0a10;
   scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
+  font-family: "Luxia", var(--font-sans);
 }
 body {
   margin: 0;
   overflow-x: clip;
   background: #1a0a10;
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: "Luxia", var(--font-sans);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -38,6 +68,9 @@ body {
 }
 button, input, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Luxia Display", "Luxia", var(--font-display);
+}
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex="0"]:focus-visible { outline: 3px solid var(--champagne); outline-offset: 4px; }
 ::selection { background: var(--rose); color: white; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

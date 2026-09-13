@@ -15,6 +15,8 @@ const requiredAssets = [
   "public/images/pink-bouquet-macro.jpg",
   "public/images/garden-party-table.jpg",
   "public/og.png",
+  "public/assets/Luxia-Display.otf",
+  "public/assets/Luxia-Regular.otf",
 ];
 
 await Promise.all(requiredAssets.map((asset) => access(asset)));
@@ -29,5 +31,6 @@ assert.match(experienceSource, /SatinCanvas/, "WebGL layer must be present");
 assert.match(experienceSource, /ReactionSticker/, "Opening reaction stickers must be present");
 assert.match(formsSource, /Seal my RSVP/, "RSVP flow must be present");
 assert.match(styleSource, /the-girls-stickers/, "Sticker experience must be present");
+assert.match(styleSource, /Luxia/, "Luxia font must be present in style");
 
 console.log("Smoke checks passed: date, WebGL, RSVP, sticker experience, and required assets.");

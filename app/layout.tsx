@@ -62,6 +62,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preload" href="/assets/Luxia-Display.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/Luxia-Regular.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+      </head>
       <body suppressHydrationWarning className={`${fraunces.variable} ${jakarta.variable} ${pinyon.variable} ${alexBrush.variable} antialiased`}>
         <div className="mobile-shell">
           {children}
