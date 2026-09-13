@@ -245,16 +245,19 @@ export function EnvelopeParallaxGate({
           const now = performance.now();
           if (force > 7.0 && now - lastShakeJiggleTime > 450) {
             lastShakeJiggleTime = now;
-            gsap.to(".gate-reaction", {
-              rotation: (idx: number) => (idx % 2 === 0 ? 12 : -12),
-              scale: 1.14,
-              duration: 0.16,
-              yoyo: true,
-              repeat: 1,
-              stagger: 0.03,
-              ease: "power2.out",
-              overwrite: "auto",
-            });
+            const slots = orbitSlotsRef.current.filter(Boolean);
+            if (slots.length > 0) {
+              gsap.to(slots, {
+                rotation: (idx: number) => (idx % 2 === 0 ? 12 : -12),
+                scale: 1.14,
+                duration: 0.16,
+                yoyo: true,
+                repeat: 1,
+                stagger: 0.03,
+                ease: "power2.out",
+                overwrite: "auto",
+              });
+            }
           }
         }
       };
@@ -484,7 +487,7 @@ export function EnvelopeParallaxGate({
         0.08
       )
       .to(
-        [".gate-orbit-slot", ".gate-reaction"],
+        orbitSlotsRef.current.filter(Boolean),
         {
           scale: 0.5,
           opacity: 0,

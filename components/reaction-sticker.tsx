@@ -30,7 +30,7 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
 
   return (
     <motion.div
-      className={`gate-reaction ${className} is-ready`}
+      className={`sticker-item ${className} is-ready`}
       animate={
         reduceMotion
           ? undefined
@@ -48,11 +48,12 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
       }}
       whileHover={{ scale: 1.12, rotate: direction * 6, transition: { type: "spring", stiffness: 400 } }}
       whileTap={{ scale: 0.93 }}
-      style={{ willChange: "transform" }}
+      style={{ willChange: "transform", opacity: 1 }}
     >
       <div
         className="gate-reaction-inner"
         style={{
+          position: "relative",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -60,21 +61,25 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
           justifyContent: "center",
         }}
       >
-        {hasError ? (
-          <div
-            className="gate-reaction-fallback"
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundImage: "url('/images/the-girls-stickers.png')",
-              backgroundSize: "300% 200%",
-              backgroundPosition: spriteFallbackPositions[index % 6],
-              backgroundRepeat: "no-repeat",
-              pointerEvents: "none",
-              userSelect: "none",
-            }}
-          />
-        ) : (
+        {/* Guaranteed base sticker face from master sprite sheet */}
+        <div
+          className="sticker-base-sprite"
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "url('/images/the-girls-stickers.png')",
+            backgroundSize: "300% 200%",
+            backgroundPosition: spriteFallbackPositions[index % 6],
+            backgroundRepeat: "no-repeat",
+            pointerEvents: "none",
+            userSelect: "none",
+            zIndex: 1,
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Animated expression frame overlay */}
+        {!hasError && (
           <img
             src={currentFrameSrc}
             alt={`Bestie expression ${index + 1}`}
@@ -86,6 +91,8 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
             height={360}
             onError={() => setHasError(true)}
             style={{
+              position: "relative",
+              zIndex: 2,
               display: "block",
               width: "100%",
               height: "100%",

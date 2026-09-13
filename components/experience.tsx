@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { CalendarPlus, ChevronDown, Gift, MapPin, Share2, Sparkles } from "lucide-react";
+import { CalendarPlus, ChevronDown, ChevronLeft, ChevronRight, Gift, MapPin, Share2, Sparkles } from "lucide-react";
 import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import Lenis from "lenis";
 import type { CSSProperties } from "react";
@@ -111,16 +111,15 @@ function SectionReveal({
   role?: string;
   "aria-labelledby"?: string;
 }) {
-  const reduceMotion = useReducedMotion();
   return (
     <motion.section
       id={id}
       role={role}
       aria-labelledby={ariaLabelledby}
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.05, margin: "0px 0px -20px 0px" }}
+      viewport={{ once: true, amount: 0.02, margin: "120px 0px" }}
       transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
@@ -173,6 +172,161 @@ function InteractiveStickerStage({ reduceMotion }: { reduceMotion: boolean }) {
           reduceMotion={reduceMotion}
         />
       ))}
+    </div>
+  );
+}
+
+function GalleryCarousel({
+  gallery,
+  reduceMotion,
+}: {
+  gallery: typeof import("@/src/data/event").gallery;
+  reduceMotion: boolean;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isDragging = useRef(false);
+
+  const scrollToIndex = (idx: number) => {
+    const target = Math.max(0, Math.min(gallery.length - 1, idx));
+    setActiveIndex(target);
+    const track = trackRef.current;
+    if (!track) return;
+    const cards = track.querySelectorAll<HTMLElement>(".gallery-card");
+    const targetCard = cards[target];
+    if (targetCard) {
+      const leftOffset = targetCard.offsetLeft - (track.clientWidth - targetCard.clientWidth) / 2;
+      track.scrollTo({ left: Math.max(0, leftOffset), behavior: "smooth" });
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isDragging.current = true;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    const diffX = Math.abs(e.touches[0].clientX - touchStartX.current);
+    const diffY = Math.abs(e.touches[0].clientY - touchStartY.current);
+    // If predominantly horizontal movement, prevent Lenis / parent scroll capture
+    if (diffX > diffY) {
+      e.stopPropagation();
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const diffX = e.changedTouches[0].clientX - touchStartX.current;
+    const diffY = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 28) {
+      if (diffX < 0) {
+        scrollToIndex(activeIndex + 1);
+      } else {
+        scrollToIndex(activeIndex - 1);
+      }
+    }
+  };
+
+  const handleScroll = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const cards = track.querySelectorAll<HTMLElement>(".gallery-card");
+    if (!cards.length) return;
+    const trackCenter = track.scrollLeft + track.clientWidth / 2;
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    cards.forEach((card, i) => {
+      const cardCenter = card.offsetLeft + card.clientWidth / 2;
+      const dist = Math.abs(trackCenter - cardCenter);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIndex = i;
+      }
+    });
+    setActiveIndex(closestIndex);
+  };
+
+  return (
+    <div className="gallery-carousel-wrap">
+      <div
+        ref={trackRef}
+        className="gallery-track"
+        data-lenis-prevent="true"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onScroll={handleScroll}
+        aria-label="Bridal shower photo gallery"
+      >
+        {gallery.map((item, index) => (
+          <motion.figure
+            key={item.src}
+            className={`gallery-card gallery-card-${index + 1}`}
+            tabIndex={0}
+            initial={reduceMotion ? false : { opacity: 0, y: 28, rotate: index === 1 ? 1.5 : -1.5 }}
+            whileInView={{ opacity: 1, y: 0, rotate: index === 1 ? 1.5 : -1.5 }}
+            viewport={{ once: true, amount: 0.12 }}
+            transition={{ duration: 0.65, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => scrollToIndex(index)}
+          >
+            <div className="gallery-image">
+              <Image src={item.src} alt={item.alt} fill sizes="(max-width: 767px) 82vw, 30vw" />
+              <div className="gallery-photo-sticker" aria-hidden="true">
+                {index === 0 && <span className="photo-sticker-pill">୨୧ The Girls</span>}
+                {index === 1 && <span className="photo-sticker-pill">♥ Forever Love</span>}
+                {index === 2 && <span className="photo-sticker-pill">✦ Best Memories ✦</span>}
+              </div>
+            </div>
+            <figcaption><span>0{index + 1}</span>{item.caption}</figcaption>
+          </motion.figure>
+        ))}
+      </div>
+
+      <div className="gallery-nav-bar">
+        <div className="gallery-dots" role="tablist" aria-label="Photo carousel pagination">
+          {gallery.map((_, dotIdx) => (
+            <button
+              key={dotIdx}
+              type="button"
+              className={`gallery-dot ${dotIdx === activeIndex ? "is-active" : ""}`}
+              onClick={() => scrollToIndex(dotIdx)}
+              aria-label={`Go to slide ${dotIdx + 1}`}
+              aria-selected={dotIdx === activeIndex}
+              role="tab"
+            />
+          ))}
+        </div>
+
+        <div className="gallery-hint-badge" aria-hidden="true">
+          <span>‹ swipe photos ›</span>
+        </div>
+
+        <div className="gallery-nav-btns">
+          <button
+            type="button"
+            className="gallery-nav-btn"
+            onClick={() => scrollToIndex(activeIndex - 1)}
+            disabled={activeIndex === 0}
+            aria-label="Previous photo"
+          >
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="gallery-nav-btn"
+            onClick={() => scrollToIndex(activeIndex + 1)}
+            disabled={activeIndex === gallery.length - 1}
+            aria-label="Next photo"
+          >
+            <ChevronRight size={18} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -245,10 +399,8 @@ export function Experience() {
       duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      syncTouch: true,
-      syncTouchLerp: 0.09,
-      touchInertiaExponent: 1.6,
-      touchMultiplier: 1.25,
+      syncTouch: false,
+      touchMultiplier: 1.0,
     });
     lenisRef.current = lenis;
     lenis.stop();
@@ -573,29 +725,7 @@ export function Experience() {
             <p>Swipe slowly — every frame comes with pure main character energy for Shaula.</p>
           </Reveal>
           <InteractiveStickerStage reduceMotion={Boolean(reduceMotion)} />
-          <div className="gallery-track" aria-label="Bridal shower photo gallery">
-            {gallery.map((item, index) => (
-              <motion.figure
-                key={item.src}
-                className={`gallery-card gallery-card-${index + 1}`}
-                tabIndex={0}
-                initial={reduceMotion ? false : { opacity: 0, y: 28, rotate: index === 1 ? 1.5 : -1.5 }}
-                whileInView={{ opacity: 1, y: 0, rotate: index === 1 ? 1.5 : -1.5 }}
-                viewport={{ once: true, amount: 0.12 }}
-                transition={{ duration: 0.65, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <div className="gallery-image">
-                  <Image src={item.src} alt={item.alt} fill sizes="(max-width: 767px) 82vw, 30vw" />
-                  <div className="gallery-photo-sticker" aria-hidden="true">
-                    {index === 0 && <span className="photo-sticker-pill">୨୧ The Girls</span>}
-                    {index === 1 && <span className="photo-sticker-pill">♥ Forever Love</span>}
-                    {index === 2 && <span className="photo-sticker-pill">✦ Best Memories ✦</span>}
-                  </div>
-                </div>
-                <figcaption><span>0{index + 1}</span>{item.caption}</figcaption>
-              </motion.figure>
-            ))}
-          </div>
+          <GalleryCarousel gallery={gallery} reduceMotion={Boolean(reduceMotion)} />
         </SectionReveal>
 
         <SectionReveal className="rundown-section" aria-labelledby="rundown-heading">
