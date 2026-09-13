@@ -11,15 +11,22 @@ type ReactionStickerProps = {
   reduceMotion: boolean;
 };
 
+const spriteFallbackPositions = [
+  "0% 0%",
+  "50% 0%",
+  "100% 0%",
+  "0% 100%",
+  "50% 100%",
+  "100% 100%",
+];
+
 export function ReactionSticker({ src, frame, className, index, reduceMotion }: ReactionStickerProps) {
   const [hasError, setHasError] = useState(false);
   const direction = index % 2 === 0 ? 1 : -1;
   const baseName = src.replace(/\.png$/, "").split("/").pop() || "back-left";
   const frameIndex = ((frame % 3) + 3) % 3;
 
-  const currentFrameSrc = hasError
-    ? src
-    : `/images/reactions/extracted/${baseName}-frame-${frameIndex}.png`;
+  const currentFrameSrc = `/images/reactions/extracted/${baseName}-frame-${frameIndex}.png`;
 
   return (
     <motion.div
@@ -53,25 +60,41 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
           justifyContent: "center",
         }}
       >
-        <img
-          src={currentFrameSrc}
-          alt={`Bestie expression ${index + 1}`}
-          loading="eager"
-          decoding="async"
-          draggable={false}
-          className="gate-reaction-img"
-          width={300}
-          height={360}
-          onError={() => setHasError(true)}
-          style={{
-            display: "block",
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        />
+        {hasError ? (
+          <div
+            className="gate-reaction-fallback"
+            style={{
+              width: "100%",
+              height: "100%",
+              backgroundImage: "url('/images/the-girls-stickers.png')",
+              backgroundSize: "300% 200%",
+              backgroundPosition: spriteFallbackPositions[index % 6],
+              backgroundRepeat: "no-repeat",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          />
+        ) : (
+          <img
+            src={currentFrameSrc}
+            alt={`Bestie expression ${index + 1}`}
+            loading="eager"
+            decoding="async"
+            draggable={false}
+            className="gate-reaction-img"
+            width={300}
+            height={360}
+            onError={() => setHasError(true)}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          />
+        )}
       </div>
     </motion.div>
   );
