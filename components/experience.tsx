@@ -8,6 +8,7 @@ import Lenis from "lenis";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Countdown } from "@/components/countdown";
+import { FloatingBalloons } from "@/components/floating-balloons";
 import { LoveNotes } from "@/components/forms";
 import { ReactionSticker } from "@/components/reaction-sticker";
 import { event, gallery, rundown, shades } from "@/src/data/event";
@@ -446,30 +447,54 @@ export function Experience() {
         <RibbonDivider />
 
         <SectionReveal className="date-section" aria-labelledby="date-heading">
-          <Reveal className="date-art" aria-hidden="true" delay={0.05}>
-            <span>15</span>
-            <p>September<br />twenty twenty-six</p>
+          <FloatingBalloons />
+          <Reveal className="date-seal-card" delay={0.06}>
+            <div className="date-seal-header">
+              <span className="seal-bow" aria-hidden="true">୨୧</span>
+              <span className="seal-tag">THE OFFICIAL DATE</span>
+              <span className="seal-sparkle" aria-hidden="true">✦</span>
+            </div>
+            <div className="date-seal-main">
+              <span className="date-seal-day">15</span>
+              <div className="date-seal-info">
+                <span className="date-seal-month">September</span>
+                <span className="date-seal-year">Tuesday · 2026</span>
+              </div>
+            </div>
+            <div className="date-seal-footer">
+              <span className="seal-dot" />
+              <p>mark your calendar · she said yes</p>
+              <span className="seal-dot" />
+            </div>
           </Reveal>
           <Reveal className="date-content" delay={0.12}>
-            <p className="mini-kicker">Save the date</p>
-            <h2 id="date-heading">It&apos;s almost time <em>to celebrate.</em></h2>
+            <div className="date-heading-wrap">
+              <p className="mini-kicker">Save the date</p>
+              <h2 id="date-heading">It&apos;s almost time <em>to celebrate.</em></h2>
+            </div>
             <Countdown />
-            <dl className="event-facts">
-              <div>
-                <dt>When</dt>
-                <dd>
-                  Tuesday, 15 September 2026<br />
-                  <span>19:00 PM WIB</span>
-                </dd>
+            <div className="event-detail-cards">
+              <div className="event-detail-card">
+                <div className="detail-card-icon" aria-hidden="true">
+                  <CalendarPlus size={18} />
+                </div>
+                <div className="detail-card-text">
+                  <span className="detail-card-label">WHEN</span>
+                  <strong className="detail-card-val">Tuesday, 15 September 2026</strong>
+                  <span className="detail-card-sub">19:00 PM WIB (Evening)</span>
+                </div>
               </div>
-              <div>
-                <dt>Where</dt>
-                <dd>
-                  Krema de Bruge<br />
-                  <span>Jl. Panglima Polim, Jakarta Selatan</span>
-                </dd>
+              <div className="event-detail-card">
+                <div className="detail-card-icon" aria-hidden="true">
+                  <MapPin size={18} />
+                </div>
+                <div className="detail-card-text">
+                  <span className="detail-card-label">WHERE</span>
+                  <strong className="detail-card-val">Krema de Bruge</strong>
+                  <span className="detail-card-sub">Jl. Panglima Polim, Jakarta Selatan</span>
+                </div>
               </div>
-            </dl>
+            </div>
             <div className="date-action-group">
               <a
                 className="pink-button"

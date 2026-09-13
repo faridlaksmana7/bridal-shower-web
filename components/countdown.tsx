@@ -47,19 +47,25 @@ export function Countdown() {
     );
   }
 
+  const formatVal = (v: number | string | undefined) => {
+    if (v === undefined || v === null || v === "—") return "—";
+    return typeof v === "number" ? String(v).padStart(2, "0") : v;
+  };
+
   const values = [
-    [remaining?.days ?? "—", "Days"],
-    [remaining?.hours ?? "—", "Hours"],
-    [remaining?.minutes ?? "—", "Minutes"],
-    [remaining?.seconds ?? "—", "Seconds"],
+    [formatVal(remaining?.days), "Days"],
+    [formatVal(remaining?.hours), "Hours"],
+    [formatVal(remaining?.minutes), "Minutes"],
+    [formatVal(remaining?.seconds), "Seconds"],
   ];
 
   return (
     <div className="countdown-grid" aria-live="polite">
-      {values.map(([value, label]) => (
-        <div key={label}>
-          <strong>{value}</strong>
-          <span>{label}</span>
+      {values.map(([value, label], idx) => (
+        <div key={label} className="countdown-card">
+          <strong className="countdown-number">{value}</strong>
+          <span className="countdown-label">{label}</span>
+          {idx < values.length - 1 && <span className="countdown-colon" aria-hidden="true">:</span>}
         </div>
       ))}
     </div>
