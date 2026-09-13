@@ -77,7 +77,7 @@ function Reveal({
   children,
   className = "",
   delay = 0,
-  y = 28,
+  y = 24,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -88,10 +88,10 @@ function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y, filter: "blur(5px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.82, delay, ease: [0.16, 1, 0.3, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.08 }}
+      transition={{ duration: 0.72, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
@@ -118,13 +118,62 @@ function SectionReveal({
       role={role}
       aria-labelledby={ariaLabelledby}
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 36, scale: 0.985 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.08, margin: "0px 0px -40px 0px" }}
-      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.05, margin: "0px 0px -20px 0px" }}
+      transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.section>
+  );
+}
+
+function InteractiveStickerStage({ reduceMotion }: { reduceMotion: boolean }) {
+  const [stageFrame, setStageFrame] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const timer = window.setInterval(() => {
+      setStageFrame((current) => (current + 1) % 3);
+    }, 2800);
+    return () => window.clearInterval(timer);
+  }, [reduceMotion]);
+
+  const nextFace = () => {
+    setStageFrame((current) => (current + 1) % 3);
+  };
+
+  return (
+    <div
+      className="sticker-stage"
+      onClick={nextFace}
+      role="button"
+      tabIndex={0}
+      aria-label="Interactive bestie appreciation corner. Tap to switch faces."
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          nextFace();
+        }
+      }}
+    >
+      <div className="sticker-copy">
+        <span>six besties</span>
+        <strong>one pink corner</strong>
+        <i>୨୧</i>
+        <span className="sticker-subhint">tap to change faces ✦</span>
+      </div>
+      {stageReactionStickers.map((sticker, index) => (
+        <ReactionSticker
+          key={`stage-${sticker.src}`}
+          src={sticker.src}
+          frame={(stageFrame + index) % 3}
+          className={sticker.className}
+          index={index}
+          reduceMotion={reduceMotion}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -163,7 +212,7 @@ export function Experience() {
   const [bowTaps, setBowTaps] = useState(0);
   const [shareStatus, setShareStatus] = useState("");
   const [canvasActive, setCanvasActive] = useState(true);
-  const [reactionFrame, setReactionFrame] = useState(0);
+  const [gateReactionFrame, setGateReactionFrame] = useState(0);
   const gateRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
@@ -193,11 +242,13 @@ export function Experience() {
   useEffect(() => {
     if (reduceMotion) return;
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      syncTouch: false,
-      touchMultiplier: 1.15,
+      syncTouch: true,
+      syncTouchLerp: 0.09,
+      touchInertiaExponent: 1.6,
+      touchMultiplier: 1.25,
     });
     lenisRef.current = lenis;
     lenis.stop();
@@ -222,13 +273,14 @@ export function Experience() {
     else lenisRef.current?.stop();
   }, [opened]);
 
+  // Only animate gate reactions while the entrance gate is visible
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion || gateGone) return;
     const timer = window.setInterval(() => {
-      setReactionFrame((current) => (current + 1) % 3);
-    }, 1200);
+      setGateReactionFrame((current) => (current + 1) % 3);
+    }, 1800);
     return () => window.clearInterval(timer);
-  }, [reduceMotion]);
+  }, [reduceMotion, gateGone]);
 
   useEffect(() => {
     const hero = document.querySelector(".hero");
@@ -326,7 +378,7 @@ export function Experience() {
               guestName={guestName}
               onOpened={openInvitation}
               reduceMotion={Boolean(reduceMotion)}
-              reactionFrame={reactionFrame}
+              reactionFrame={gateReactionFrame}
               reactionStickers={reactionStickers}
             />
           </motion.section>
@@ -520,49 +572,25 @@ export function Experience() {
             <h2 id="gallery-heading">The Bride<br /><em>Appreciation Club.</em></h2>
             <p>Swipe slowly — every frame comes with pure main character energy for Shaula.</p>
           </Reveal>
-          <div
-            className="sticker-stage"
-            onClick={() => setReactionFrame((current) => (current + 1) % 3)}
-            role="button"
-            tabIndex={0}
-            aria-label="Interactive bestie appreciation corner. Tap to switch faces."
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setReactionFrame((current) => (current + 1) % 3);
-              }
-            }}
-          >
-            <div className="sticker-copy">
-              <span>six besties</span>
-              <strong>one pink corner</strong>
-              <i>୨୧</i>
-              <span className="sticker-subhint">tap to change faces ✦</span>
-            </div>
-            {stageReactionStickers.map((sticker, index) => (
-              <ReactionSticker
-                key={`stage-${sticker.src}`}
-                src={sticker.src}
-                frame={(reactionFrame + index) % 3}
-                className={sticker.className}
-                index={index}
-                reduceMotion={Boolean(reduceMotion)}
-              />
-            ))}
-          </div>
+          <InteractiveStickerStage reduceMotion={Boolean(reduceMotion)} />
           <div className="gallery-track" aria-label="Bridal shower photo gallery">
             {gallery.map((item, index) => (
               <motion.figure
                 key={item.src}
                 className={`gallery-card gallery-card-${index + 1}`}
                 tabIndex={0}
-                initial={reduceMotion ? false : { opacity: 0, y: 44, rotate: index === 1 ? 2 : -2, filter: "blur(4px)" }}
-                whileInView={{ opacity: 1, y: 0, rotate: index === 1 ? 2 : -2, filter: "blur(0px)" }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.8, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                initial={reduceMotion ? false : { opacity: 0, y: 28, rotate: index === 1 ? 1.5 : -1.5 }}
+                whileInView={{ opacity: 1, y: 0, rotate: index === 1 ? 1.5 : -1.5 }}
+                viewport={{ once: true, amount: 0.12 }}
+                transition={{ duration: 0.65, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="gallery-image">
                   <Image src={item.src} alt={item.alt} fill sizes="(max-width: 767px) 82vw, 30vw" />
+                  <div className="gallery-photo-sticker" aria-hidden="true">
+                    {index === 0 && <span className="photo-sticker-pill">୨୧ The Girls</span>}
+                    {index === 1 && <span className="photo-sticker-pill">♥ Forever Love</span>}
+                    {index === 2 && <span className="photo-sticker-pill">✦ Best Memories ✦</span>}
+                  </div>
                 </div>
                 <figcaption><span>0{index + 1}</span>{item.caption}</figcaption>
               </motion.figure>
@@ -580,8 +608,8 @@ export function Experience() {
             {rundown.map((item, index) => (
               <motion.li
                 key={item.title}
-                initial={reduceMotion ? false : { opacity: 0, x: 24, filter: "blur(3px)" }}
-                whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                initial={reduceMotion ? false : { opacity: 0, x: 24 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 0.58, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
               >

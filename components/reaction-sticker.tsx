@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type ReactionStickerProps = {
   src: string;
@@ -12,55 +12,46 @@ type ReactionStickerProps = {
 };
 
 export function ReactionSticker({ src, frame, className, index, reduceMotion }: ReactionStickerProps) {
-  const [loaded, setLoaded] = useState(true);
-  const [failedFrames, setFailedFrames] = useState<Record<number, boolean>>({});
+  const [hasError, setHasError] = useState(false);
   const direction = index % 2 === 0 ? 1 : -1;
   const baseName = src.replace(/\.png$/, "").split("/").pop() || "back-left";
   const frameIndex = ((frame % 3) + 3) % 3;
-  const currentFrameSrc = failedFrames[frameIndex]
+
+  const currentFrameSrc = hasError
     ? src
     : `/images/reactions/extracted/${baseName}-frame-${frameIndex}.png`;
 
-  // Preload all 3 expression frames for this sticker so switching is instantaneous
-  useEffect(() => {
-    [0, 1, 2].forEach((f) => {
-      const img = new window.Image();
-      img.src = `/images/reactions/extracted/${baseName}-frame-${f}.png`;
-      img.onerror = () => {
-        setFailedFrames((prev) => ({ ...prev, [f]: true }));
-      };
-    });
-  }, [baseName]);
-
   return (
     <motion.div
-      className={`gate-reaction ${className} ${loaded ? "is-ready" : "is-ready"}`}
-      animate={reduceMotion ? undefined : {
-        x: [0, direction * 4.5, direction * -3.5, 0],
-        y: [0, -8 - (index % 3) * 2, 4, 0],
-        rotate: [0, direction * 4.5, direction * -3.5, 0],
-      }}
+      className={`gate-reaction ${className} is-ready`}
+      animate={
+        reduceMotion
+          ? undefined
+          : {
+              x: [0, direction * 4, direction * -3, 0],
+              y: [0, -7 - (index % 3) * 2, 3, 0],
+              rotate: [0, direction * 4, direction * -3, 0],
+            }
+      }
       transition={{
-        duration: 3.8 + index * 0.32,
-        delay: index * 0.12,
+        duration: 3.6 + index * 0.3,
+        delay: index * 0.1,
         ease: "easeInOut",
         repeat: Infinity,
       }}
-      whileHover={{ scale: 1.14, rotate: direction * 7, transition: { type: "spring", stiffness: 420 } }}
-      whileTap={{ scale: 0.92 }}
+      whileHover={{ scale: 1.12, rotate: direction * 6, transition: { type: "spring", stiffness: 400 } }}
+      whileTap={{ scale: 0.93 }}
+      style={{ willChange: "transform" }}
     >
-      <motion.div
-        key={frameIndex}
+      <div
         className="gate-reaction-inner"
-        initial={reduceMotion ? false : { scale: 0.88, rotate: direction * -5, y: 2 }}
-        animate={{ scale: 1, rotate: 0, y: 0 }}
-        transition={{
-          type: "spring",
-          stiffness: 520,
-          damping: 18,
-          mass: 0.75,
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-        style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
       >
         <img
           src={currentFrameSrc}
@@ -71,11 +62,7 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
           className="gate-reaction-img"
           width={300}
           height={360}
-          onLoad={() => setLoaded(true)}
-          onError={() => {
-            setFailedFrames((prev) => ({ ...prev, [frameIndex]: true }));
-            setLoaded(true);
-          }}
+          onError={() => setHasError(true)}
           style={{
             display: "block",
             width: "100%",
@@ -85,8 +72,7 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
             userSelect: "none",
           }}
         />
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
-
