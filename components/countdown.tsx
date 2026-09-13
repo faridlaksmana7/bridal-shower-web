@@ -35,23 +35,23 @@ export function Countdown() {
   }, [remaining]);
 
   if (remaining?.done) {
-    return <p className="countdown-done">The pink hour is here. See you inside!</p>;
+    return <p className="countdown-done">The celebration is here! Welcome to Shaula&apos;s bridal shower.</p>;
   }
 
   if (!hasTime) {
     return (
       <div className="countdown-days" aria-live="polite">
         <strong>{daysToDate}</strong>
-        <span>hari menuju hari paling pink</span>
+        <span>days until the sweetest celebration</span>
       </div>
     );
   }
 
   const values = [
-    [remaining?.days ?? "—", "Hari"],
-    [remaining?.hours ?? "—", "Jam"],
-    [remaining?.minutes ?? "—", "Menit"],
-    [remaining?.seconds ?? "—", "Detik"],
+    [remaining?.days ?? "—", "Days"],
+    [remaining?.hours ?? "—", "Hours"],
+    [remaining?.minutes ?? "—", "Minutes"],
+    [remaining?.seconds ?? "—", "Seconds"],
   ];
 
   return (

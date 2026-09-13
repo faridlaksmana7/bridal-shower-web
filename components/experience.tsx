@@ -2,13 +2,13 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { CalendarPlus, ChevronDown, Gift, Share2, Sparkles } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { CalendarPlus, ChevronDown, Gift, MapPin, Share2, Sparkles } from "lucide-react";
+import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import Lenis from "lenis";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Countdown } from "@/components/countdown";
-import { LoveNotes, RSVPForm } from "@/components/forms";
+import { LoveNotes } from "@/components/forms";
 import { ReactionSticker } from "@/components/reaction-sticker";
 import { event, gallery, rundown, shades } from "@/src/data/event";
 
@@ -17,58 +17,137 @@ const SatinCanvas = dynamic(
   { ssr: false, loading: () => <div className="canvas-poster" aria-hidden="true" /> },
 );
 
-const reveal = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
+const EnvelopeParallaxGate = dynamic(
+  () => import("@/components/envelope-parallax-gate").then((module) => module.EnvelopeParallaxGate),
+  { ssr: false, loading: () => <div className="envelope-loading" aria-hidden="true" /> },
+);
 
-const stickerPositions = ["0% 0%", "50% 0%", "100% 0%", "0% 100%", "50% 100%", "100% 100%"];
+const ButterflyTransition = dynamic(
+  () => import("@/components/butterfly-transition").then((module) => module.ButterflyTransition),
+  { ssr: false },
+);
+
+const MusicPlayer = dynamic(
+  () => import("@/components/music-player").then((module) => module.MusicPlayer),
+  { ssr: false },
+);
+
+function RibbonDivider({ light = false }: { light?: boolean }) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <motion.div
+      className={`section-divider ${light ? "light" : ""}`}
+      aria-hidden="true"
+      initial={reduceMotion ? false : { opacity: 0, scale: 0.68, y: 16 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <svg width="46" height="20" viewBox="0 0 46 20" fill="none" className="divider-bow">
+        <path
+          d="M23 10 C19 4, 9 2, 4 8 C-1 14, 8 18, 21 11 L23 10 L25 11 C38 18, 47 14, 42 8 C37 2, 27 4, 23 10 Z"
+          fill={light ? "rgba(255, 255, 255, 0.4)" : "rgba(243, 53, 140, 0.35)"}
+        />
+        <circle cx="23" cy="10" r="2.2" fill={light ? "#ffffff" : "var(--rose)"} />
+      </svg>
+    </motion.div>
+  );
+}
+
 const reactionStickers = [
-  { src: "/images/reactions/back-left.png", className: "gate-reaction-one" },
-  { src: "/images/reactions/back-center.png", className: "gate-reaction-two" },
-  { src: "/images/reactions/back-right.png", className: "gate-reaction-three" },
-  { src: "/images/reactions/front-left.png", className: "gate-reaction-four" },
-  { src: "/images/reactions/front-center.png", className: "gate-reaction-five" },
-  { src: "/images/reactions/front-right.png", className: "gate-reaction-six" },
+  { src: "/images/reactions/back-left.png", className: "gate-reaction-1" },
+  { src: "/images/reactions/back-center.png", className: "gate-reaction-2" },
+  { src: "/images/reactions/back-right.png", className: "gate-reaction-3" },
+  { src: "/images/reactions/front-left.png", className: "gate-reaction-4" },
+  { src: "/images/reactions/front-center.png", className: "gate-reaction-5" },
+  { src: "/images/reactions/front-right.png", className: "gate-reaction-6" },
 ];
 
-function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+const stageReactionStickers = [
+  { src: "/images/reactions/back-left.png", className: "stage-reaction stage-reaction-1" },
+  { src: "/images/reactions/back-center.png", className: "stage-reaction stage-reaction-2" },
+  { src: "/images/reactions/back-right.png", className: "stage-reaction stage-reaction-3" },
+  { src: "/images/reactions/front-left.png", className: "stage-reaction stage-reaction-4" },
+  { src: "/images/reactions/front-center.png", className: "stage-reaction stage-reaction-5" },
+  { src: "/images/reactions/front-right.png", className: "stage-reaction stage-reaction-6" },
+];
+
+function Reveal({
+  children,
+  className = "",
+  delay = 0,
+  y = 28,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  y?: number;
+}) {
   const reduceMotion = useReducedMotion();
   return (
     <motion.div
       className={className}
-      variants={reveal}
-      initial={reduceMotion ? "visible" : "hidden"}
-      whileInView="visible"
-      viewport={{ once: true, amount: .18 }}
-      transition={{ duration: .78, ease: [.16, 1, .3, 1] }}
+      initial={reduceMotion ? false : { opacity: 0, y, filter: "blur(5px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 0.82, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
   );
 }
 
+function SectionReveal({
+  children,
+  className = "",
+  id,
+  role,
+  "aria-labelledby": ariaLabelledby,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+  role?: string;
+  "aria-labelledby"?: string;
+}) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <motion.section
+      id={id}
+      role={role}
+      aria-labelledby={ariaLabelledby}
+      className={className}
+      initial={reduceMotion ? false : { opacity: 0, y: 36, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.08, margin: "0px 0px -40px 0px" }}
+      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
 function downloadCalendar() {
   const day = event.dateISO.replaceAll("-", "");
-  const nextDay = "20260916";
   const calendar = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Pinky Promise//Bridal Shower//ID",
+    "PRODID:-//Pinky Promise//Bridal Shower//EN",
     "BEGIN:VEVENT",
-    `UID:pinky-promise-${day}@local`,
-    `DTSTAMP:${day}T000000Z`,
-    `DTSTART;VALUE=DATE:${day}`,
-    `DTEND;VALUE=DATE:${nextDay}`,
-    "SUMMARY:Pinky Promise — Bridal Shower",
-    "DESCRIPTION:A little pink, a lot of love, one forever promise.",
+    `UID:pinky-promise-${day}@shaula`,
+    `DTSTAMP:${day}T120000Z`,
+    `DTSTART;TZID=Asia/Jakarta:${day}T190000`,
+    `DTEND;TZID=Asia/Jakarta:${day}T220000`,
+    "SUMMARY:Surprise Bridal Shower for Shaula Putri",
+    "DESCRIPTION:Please join us for a surprise bridal shower for Shaula Putri (Dimas & Shaula Putri Andana) at Krema de Bruge.",
+    "LOCATION:Krema de Bruge",
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");
   const url = URL.createObjectURL(new Blob([calendar], { type: "text/calendar;charset=utf-8" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = "pinky-promise-15-september-2026.ics";
+  link.download = "shaula-bridal-shower-15-september-2026.ics";
   link.click();
   URL.revokeObjectURL(url);
 }
@@ -112,7 +191,13 @@ export function Experience() {
 
   useEffect(() => {
     if (reduceMotion) return;
-    const lenis = new Lenis({ duration: 1.05, smoothWheel: true, syncTouch: false });
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      syncTouch: false,
+      touchMultiplier: 1.15,
+    });
     lenisRef.current = lenis;
     lenis.stop();
     let raf = 0;
@@ -137,12 +222,12 @@ export function Experience() {
   }, [opened]);
 
   useEffect(() => {
-    if (reduceMotion || opened) return;
+    if (reduceMotion) return;
     const timer = window.setInterval(() => {
       setReactionFrame((current) => (current + 1) % 3);
-    }, 1450);
+    }, 1200);
     return () => window.clearInterval(timer);
-  }, [opened, reduceMotion]);
+  }, [reduceMotion]);
 
   useEffect(() => {
     const hero = document.querySelector(".hero");
@@ -159,10 +244,12 @@ export function Experience() {
 
   function openInvitation() {
     setOpened(true);
+    // The 3D envelope has already done its opening animation.
+    // Give the AnimatePresence exit animation a moment before unmounting.
     window.setTimeout(() => {
       setGateGone(true);
       heroTitleRef.current?.focus();
-    }, reduceMotion ? 30 : 1000);
+    }, reduceMotion ? 30 : 800);
   }
 
   function moveGateReactions(event: React.PointerEvent<HTMLElement>) {
@@ -198,15 +285,15 @@ export function Experience() {
 
   async function shareInvitation() {
     const data = {
-      title: "Pinky Promise — Bridal Shower",
-      text: "A little pink, a lot of love · 15 September 2026",
+      title: "Surprise Bridal Shower for Shaula Putri",
+      text: "Please join us for a surprise bridal shower for Shaula Putri (Dimas & Shaula) · Tuesday, 15 September 2026 at Krema de Bruge",
       url: window.location.href,
     };
     try {
       if (navigator.share) await navigator.share(data);
       else {
         await navigator.clipboard.writeText(data.url);
-        setShareStatus("Link sudah disalin.");
+        setShareStatus("Invitation link copied to clipboard!");
       }
     } catch {
       setShareStatus("");
@@ -217,177 +304,237 @@ export function Experience() {
 
   return (
     <main className="invitation-shell" style={rootStyle}>
-      <a className="skip-link" href="#details">Lewati ke detail acara</a>
+      <a className="skip-link" href="#details">Skip to event details</a>
 
-      {!gateGone && (
-        <section
-          ref={gateRef}
-          className={`invitation-gate ${opened ? "is-open" : ""}`}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="gate-title"
-          onPointerMove={moveGateReactions}
-          onPointerLeave={resetGateReactions}
-        >
-          <div className="gate-grain" aria-hidden="true" />
-          <div className="gate-orbit gate-orbit-one" aria-hidden="true" />
-          <div className="gate-orbit gate-orbit-two" aria-hidden="true" />
-          <p className="gate-kicker">A little something lovely has arrived</p>
-          <div className="gate-card">
-            <div className="gate-reactions" aria-hidden="true">
-              {reactionStickers.map((sticker, index) => (
-                <ReactionSticker
-                  key={sticker.src}
-                  src={sticker.src}
-                  className={sticker.className}
-                  index={index}
-                  frame={(reactionFrame + index) % 3}
-                  reduceMotion={Boolean(reduceMotion)}
-                />
-              ))}
-            </div>
-            <p className="gate-for">Khusus untuk</p>
-            <h2 className="gate-guest" id="gate-title">{guestName}</h2>
-            <span className="gate-rule" aria-hidden="true" />
-            <p className="gate-copy">You&apos;re invited to celebrate our favorite bride-to-be.</p>
-            <button type="button" className="seal-button" onClick={openInvitation} autoFocus>
-              <span className="seal-shine" aria-hidden="true" />
-              <span className="seal-mark">P</span>
-              <span className="sr-only">Buka undangan</span>
-            </button>
-            <button type="button" className="open-button" onClick={openInvitation}>
-              Buka undangannya <span aria-hidden="true">↗</span>
-            </button>
-            <p className="gate-note">open the pink envelope</p>
-            <p className="reaction-caption"><span>6 besties</span><i />18 little moods</p>
-          </div>
-        </section>
-      )}
+      <AnimatePresence>
+        {!gateGone && (
+          <motion.section
+            key="envelope-gate"
+            className={`invitation-gate envelope-gate ${opened ? "is-open" : ""}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gate-title"
+            exit={{
+              opacity: 0,
+              scale: 1.06,
+              filter: "blur(18px)",
+              transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+            }}
+          >
+            <EnvelopeParallaxGate
+              guestName={guestName}
+              onOpened={openInvitation}
+              reduceMotion={Boolean(reduceMotion)}
+              reactionFrame={reactionFrame}
+              reactionStickers={reactionStickers}
+            />
+          </motion.section>
+        )}
+      </AnimatePresence>
 
       <div ref={mainRef} data-main-content>
+        {opened && <ButterflyTransition />}
+        <MusicPlayer opened={opened} />
+
         <div className="page-progress" ref={progressRef} aria-hidden="true">
           <span />
-          {[0, 1, 2, 3, 4, 5].map((dot) => <i key={dot} />)}
+          {[0, 1, 2, 3, 4].map((dot) => <i key={dot} />)}
         </div>
 
         <section className="hero" id="hero" aria-labelledby="hero-title">
           <Image
             className="hero-image"
-            src="/images/hero-pink-tablescape.jpg"
-            alt="Meja perayaan bernuansa pink dengan bunga, piring, dan gelas"
+            src="/assets/Bghero.png"
+            alt="Dreamy glowing pink aura hearts and sparkle stars backdrop"
             fill
             priority
-            sizes="100vw"
+            sizes="(max-width: 430px) 100vw, 390px"
           />
           <div className="hero-wash" aria-hidden="true" />
           <div className="hero-canvas" aria-hidden="true">
             <div className="canvas-poster" />
             {!reduceMotion && <SatinCanvas accent={accent} opened={opened} active={canvasActive} />}
           </div>
-          <nav className="hero-nav" aria-label="Navigasi utama">
-            <span className="monogram">PP</span>
-            <span className="nav-date">15 · 09 · 26</span>
-          </nav>
           <div className="hero-content">
-            <p className="eyebrow">A bridal shower for</p>
-            <h1 id="hero-title" ref={heroTitleRef} tabIndex={-1}>
-              Pinky <em>Promise</em>
-            </h1>
-            <p className="hero-copy">
-              Sebelum ia berkata “I do”, mari rayakan satu sore penuh tawa,
-              cake, happy tears, dan semua perempuan yang paling menyayanginya.
-            </p>
-            <div className="hero-date">
-              <span>Selasa / Tuesday</span>
-              <strong>15 September 2026</strong>
+            <div className="hero-eyebrow-container">
+              <span className="hero-pill-badge">
+                <span className="pill-sparkle">✦</span>
+                <span>Surprise Bridal Shower</span>
+                <span className="pill-sparkle">✦</span>
+              </span>
+              <p className="hero-invitation-lead">Please join us to celebrate our bride-to-be</p>
             </div>
+
+            <h1 id="hero-title" ref={heroTitleRef} tabIndex={-1} className="hero-title-badge">
+              <span className="sr-only">Shaula Putri</span>
+              <Image
+                src="/assets/Shaula.png"
+                alt="Shaula Putri"
+                width={360}
+                height={360}
+                className="hero-name-graphic"
+                priority
+              />
+            </h1>
+
+            <div className="hero-taglines">
+              <p className="hero-script-tagline">She said yes for forever</p>
+              <p className="hero-commemorate-text">
+                To celebrate and commemorate the milestone of<br />
+                <strong className="hero-couple-highlight">Dimas &amp; Shaula Putri Andana</strong>
+              </p>
+            </div>
+
+            <div className="hero-info-ticket">
+              <div className="ticket-top-row">
+                <div className="ticket-col">
+                  <span className="ticket-dim-label">DATE</span>
+                  <span className="ticket-bold-val">Tuesday, 15 Sept 2026</span>
+                </div>
+                <div className="ticket-vert-line" />
+                <div className="ticket-col">
+                  <span className="ticket-dim-label">TIME</span>
+                  <span className="ticket-bold-val">19:00 PM</span>
+                </div>
+              </div>
+              <div className="ticket-bottom-row">
+                <MapPin size={13} className="ticket-icon" aria-hidden="true" />
+                <span>Krema de Bruge</span>
+              </div>
+            </div>
+
             <button className="hero-cta" type="button" onClick={() => scrollTo("details")}>
-              Lihat detail acara <ChevronDown size={17} aria-hidden="true" />
+              <span>See Event Details</span>
+              <span className="hero-cta-chevron" aria-hidden="true">
+                <ChevronDown size={15} />
+              </span>
             </button>
+
+            <div className="hero-bottom-bar">
+              <button className="hero-bow" type="button" onClick={tapBow} aria-label="Tap the bow for a secret surprise">
+                <span aria-hidden="true">୨୧</span>
+              </button>
+              <p className="hero-whisper">she said yes for forever — now let&apos;s make her blush.</p>
+            </div>
           </div>
-          <button className="hero-bow" type="button" onClick={tapBow} aria-label="Pita kecil dengan kejutan tersembunyi">
-            <span aria-hidden="true">୨୧</span>
-          </button>
-          <p className="hero-whisper">she found her forever — now let&apos;s make her blush.</p>
         </section>
 
         <div className="ticker" aria-hidden="true">
-          <div>BRIDE TO BE · PINKY PROMISE · HAPPY TEARS · 15.09.2026 · BRIDE TO BE · PINKY PROMISE · HAPPY TEARS · 15.09.2026 ·</div>
+          <div>SURPRISE BRIDAL SHOWER · SHAULA PUTRI · DIMAS &amp; SHAULA · 15.09.2026 · KREMA DE BRUGE · SHE SAID YES FOR FOREVER ·</div>
         </div>
 
-        <section className="intro-section" id="details">
-          <Reveal className="section-label"><span>01</span><p>For our favorite girl</p></Reveal>
+        <SectionReveal className="intro-section" id="details">
+          <Reveal className="section-label"><span>01</span><p>Celebrating our favorite girl</p></Reveal>
           <div className="intro-grid">
-            <Reveal className="intro-copy">
-              <p className="mini-kicker">One pink afternoon</p>
-              <h2>For the girl entering her <em>forever era.</em></h2>
+            <Reveal className="intro-copy" delay={0.06}>
+              <p className="mini-kicker">One unforgettable evening</p>
+              <h2>To celebrate &amp; commemorate <em>their love.</em></h2>
               <p className="intro-body">
-                She found her person. Sekarang waktunya kita mengelilinginya dengan cinta,
-                cerita lama, doa baik, dan beberapa kejutan berwarna pink.
+                She said yes for forever! Dimas and Shaula Putri Andana are embarking on their forever journey,
+                and we&apos;re gathering her closest girls for a secret evening of laughter, cake, sweet memories, and happy tears.
               </p>
             </Reveal>
-            <Reveal className="intro-photo-wrap">
+            <Reveal className="intro-photo-wrap" delay={0.14}>
               <figure className="intro-photo">
-                <Image src="/images/pink-bouquet-macro.jpg" alt="Bouquet mawar pink dalam close-up editorial" fill sizes="(max-width: 767px) 84vw, 38vw" />
+                <Image src="/images/pink-bouquet-macro.jpg" alt="Editorial close up of romantic pink rose bouquet" fill sizes="(max-width: 767px) 84vw, 38vw" />
               </figure>
               <p className="photo-note">come for the bride,<br />stay for the cake.</p>
             </Reveal>
           </div>
-        </section>
+        </SectionReveal>
 
-        <section className="date-section" aria-labelledby="date-heading">
-          <Reveal className="date-art" aria-hidden="true">
+        <RibbonDivider />
+
+        <SectionReveal className="date-section" aria-labelledby="date-heading">
+          <Reveal className="date-art" aria-hidden="true" delay={0.05}>
             <span>15</span>
             <p>September<br />twenty twenty-six</p>
           </Reveal>
-          <Reveal className="date-content">
-            <p className="mini-kicker">Counting down to her sweetest yes</p>
-            <h2 id="date-heading">Save the <em>pink date.</em></h2>
+          <Reveal className="date-content" delay={0.12}>
+            <p className="mini-kicker">Save the date</p>
+            <h2 id="date-heading">It&apos;s almost time <em>to celebrate.</em></h2>
             <Countdown />
             <dl className="event-facts">
-              <div><dt>When</dt><dd>{event.dateLabel}<br /><span>Detail waktu segera diumumkan</span></dd></div>
-              <div><dt>Where</dt><dd>Tempat cantik pilihan kami<br /><span>Detail lokasi segera diumumkan</span></dd></div>
+              <div>
+                <dt>When</dt>
+                <dd>
+                  Tuesday, 15 September 2026<br />
+                  <span>19:00 PM WIB</span>
+                </dd>
+              </div>
+              <div>
+                <dt>Where</dt>
+                <dd>
+                  Krema de Bruge<br />
+                  <span>Jl. Panglima Polim, Jakarta Selatan</span>
+                </dd>
+              </div>
             </dl>
-            <button className="outline-button" type="button" onClick={downloadCalendar}>
-              <CalendarPlus size={17} aria-hidden="true" /> Simpan ke kalender
-            </button>
+            <div className="date-action-group">
+              <a
+                className="pink-button"
+                href={event.mapsUrl ?? "https://www.google.com/maps/search/?api=1&query=Krema+de+Bruge"}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <MapPin size={17} aria-hidden="true" /> Open in Google Maps
+              </a>
+              <button className="outline-button" type="button" onClick={downloadCalendar}>
+                <CalendarPlus size={17} aria-hidden="true" /> Add to calendar
+              </button>
+            </div>
           </Reveal>
-        </section>
+        </SectionReveal>
 
-        <section className="gallery-section" id="gallery" aria-labelledby="gallery-heading">
+        <RibbonDivider light />
+
+        <SectionReveal className="gallery-section" id="gallery" aria-labelledby="gallery-heading">
           <Reveal className="gallery-heading">
             <div className="section-label light"><span>02</span><p>Camera roll incoming</p></div>
             <h2 id="gallery-heading">The Bride<br /><em>Appreciation Club.</em></h2>
-            <p>Swipe pelan-pelan—setiap frame datang dengan sedikit main character energy.</p>
+            <p>Swipe slowly — every frame comes with pure main character energy for Shaula.</p>
           </Reveal>
-          <div className="sticker-stage" aria-hidden="true">
+          <div
+            className="sticker-stage"
+            onClick={() => setReactionFrame((current) => (current + 1) % 3)}
+            role="button"
+            tabIndex={0}
+            aria-label="Interactive bestie appreciation corner. Tap to switch faces."
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setReactionFrame((current) => (current + 1) % 3);
+              }
+            }}
+          >
             <div className="sticker-copy">
-              <span>six girls</span>
+              <span>six besties</span>
               <strong>one pink corner</strong>
               <i>୨୧</i>
+              <span className="sticker-subhint">tap to change faces ✦</span>
             </div>
-            {stickerPositions.map((position, index) => (
-              <motion.div
-                key={position}
-                className={`face-sticker face-sticker-${index + 1}`}
-                style={{ backgroundPosition: position }}
-                initial={reduceMotion ? false : { opacity: 0, y: 70, scale: .72, rotate: index % 2 ? 13 : -13 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1, rotate: index % 2 ? 4 : -4 }}
-                viewport={{ once: true, amount: .3 }}
-                transition={{ duration: .72, delay: index * .085, ease: [.16, 1, .3, 1] }}
+            {stageReactionStickers.map((sticker, index) => (
+              <ReactionSticker
+                key={`stage-${sticker.src}`}
+                src={sticker.src}
+                frame={(reactionFrame + index) % 3}
+                className={sticker.className}
+                index={index}
+                reduceMotion={Boolean(reduceMotion)}
               />
             ))}
           </div>
-          <div className="gallery-track" aria-label="Galeri foto bridal shower">
+          <div className="gallery-track" aria-label="Bridal shower photo gallery">
             {gallery.map((item, index) => (
               <motion.figure
                 key={item.src}
                 className={`gallery-card gallery-card-${index + 1}`}
                 tabIndex={0}
-                initial={reduceMotion ? false : { opacity: 0, y: 44, rotate: index === 1 ? 2 : -2 }}
-                whileInView={{ opacity: 1, y: 0, rotate: index === 1 ? 2 : -2 }}
-                viewport={{ once: true, amount: .22 }}
-                transition={{ duration: .8, delay: index * .08, ease: [.16, 1, .3, 1] }}
+                initial={reduceMotion ? false : { opacity: 0, y: 44, rotate: index === 1 ? 2 : -2, filter: "blur(4px)" }}
+                whileInView={{ opacity: 1, y: 0, rotate: index === 1 ? 2 : -2, filter: "blur(0px)" }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.8, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="gallery-image">
                   <Image src={item.src} alt={item.alt} fill sizes="(max-width: 767px) 82vw, 30vw" />
@@ -396,11 +543,11 @@ export function Experience() {
               </motion.figure>
             ))}
           </div>
-        </section>
+        </SectionReveal>
 
-        <section className="rundown-section" aria-labelledby="rundown-heading">
+        <SectionReveal className="rundown-section" aria-labelledby="rundown-heading">
           <Reveal className="rundown-title">
-            <div className="section-label"><span>03</span><p>The little plan</p></div>
+            <div className="section-label"><span>03</span><p>The pink plan</p></div>
             <p className="mini-kicker">A little plan, a lot of fun</p>
             <h2 id="rundown-heading">The pink<br /><em>agenda.</em></h2>
           </Reveal>
@@ -408,30 +555,35 @@ export function Experience() {
             {rundown.map((item, index) => (
               <motion.li
                 key={item.title}
-                initial={reduceMotion ? false : { opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: .45 }}
-                transition={{ duration: .58, delay: index * .04 }}
+                initial={reduceMotion ? false : { opacity: 0, x: 24, filter: "blur(3px)" }}
+                whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.58, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
               >
                 <span>0{index + 1}</span>
                 <div><h3>{item.title}</h3><p>{item.copy}</p></div>
               </motion.li>
             ))}
           </ol>
-          <p className="schedule-note">Urutan acara sudah siap; jam detail akan dibagikan segera.</p>
-        </section>
+          <Reveal delay={0.16}><p className="schedule-note">Order of events is set; timing will flow naturally with the laughter.</p></Reveal>
+        </SectionReveal>
 
-        <section className="dress-section" aria-labelledby="dress-heading">
-          <div className="dress-photo">
-            <Image src="/images/place-setting-detail.jpg" alt="Detail meja pastel sebagai inspirasi palet dress code" fill sizes="(max-width: 767px) 100vw, 46vw" />
+        <RibbonDivider />
+
+        <SectionReveal className="dress-section" aria-labelledby="dress-heading">
+          <Reveal className="dress-photo" delay={0.05}>
+            <Image src="/images/place-setting-detail.jpg" alt="Romantic pastel table setting as dress code palette inspiration" fill sizes="(max-width: 767px) 100vw, 46vw" />
             <span>wear<br />the mood</span>
-          </div>
-          <Reveal className="dress-copy">
+          </Reveal>
+          <Reveal className="dress-copy" delay={0.12}>
             <div className="section-label"><span>04</span><p>Dress code</p></div>
-            <p className="mini-kicker">Think romantic, polished & playful</p>
-            <h2 id="dress-heading">Pretty in <em>pink.</em></h2>
-            <p>Pilih blush, petal, rose, berry, atau soft ivory. Pure white is lovingly reserved for the bride.</p>
-            <div className="swatches" aria-label="Pilihan warna dress code">
+            <p className="mini-kicker">Think romantic, polished &amp; playful</p>
+            <h2 id="dress-heading">Come dressed in your<br /><em>best pink dresses.</em></h2>
+            <p>I can&apos;t wait to celebrate this beautiful moment with you in true pink style.</p>
+            <p style={{ fontSize: "0.88rem", opacity: 0.85, marginTop: "-12px" }}>
+              Choose blush, petal, rose, berry, or soft ivory. Pure white is lovingly reserved for the bride.
+            </p>
+            <div className="swatches" aria-label="Dress code color palette">
               {shades.map((shade) => (
                 <button
                   type="button"
@@ -447,56 +599,50 @@ export function Experience() {
             </div>
             <p className="tap-note">Tap a shade to try the mood.</p>
           </Reveal>
-        </section>
+        </SectionReveal>
 
-        <section className="notes-section" aria-labelledby="notes-heading">
+        <RibbonDivider light />
+
+        <SectionReveal className="notes-section" aria-labelledby="notes-heading">
           <Reveal className="notes-copy">
             <div className="section-label light"><span>05</span><p>Love-note wall</p></div>
-            <p className="mini-kicker">A tiny letter for her</p>
-            <h2 id="notes-heading">Dear bride, <em>…</em></h2>
-            <p>Titip satu kalimat untuk dibaca saat ia membutuhkan senyum—doa, kenangan kecil, atau inside joke yang hanya kalian pahami.</p>
+            <p className="mini-kicker">A tiny letter for Shaula</p>
+            <h2 id="notes-heading">Dear bride, <em>with all our love.</em></h2>
+            <p>Leave a sentence for Shaula to read whenever she needs a smile — a heartfelt prayer, a funny memory, or an inside joke only you two share.</p>
           </Reveal>
-          <Reveal><LoveNotes /></Reveal>
-        </section>
+          <Reveal delay={0.1}><LoveNotes /></Reveal>
+        </SectionReveal>
 
-        <section className="gift-section">
+        <RibbonDivider />
+
+        <SectionReveal className="gift-section">
           <div className="gift-image">
-            <Image src="/images/garden-party-table.jpg" alt="Meja perayaan di taman dengan bunga-bunga lembut" fill sizes="100vw" />
+            <Image src="/images/garden-party-table.jpg" alt="Garden celebration table with soft floral arrangements" fill sizes="100vw" />
           </div>
-          <Reveal className="gift-card">
+          <Reveal className="gift-card" delay={0.1}>
             <Gift size={24} aria-hidden="true" />
-            <p className="mini-kicker">A little note</p>
+            <p className="mini-kicker">A gentle note</p>
             <h2>Your presence is the <em>prettiest present.</em></h2>
-            <p>Tidak ada kewajiban membawa hadiah. Kehadiran, pelukan, dan waktu bersamamu sudah lebih dari cukup.</p>
+            <p>There is no obligation to bring a gift. Your presence, warm hugs, and cherished time together are more than enough.</p>
           </Reveal>
-        </section>
+        </SectionReveal>
 
-        <section className="rsvp-section" id="rsvp" aria-labelledby="rsvp-heading">
-          <Reveal className="rsvp-heading">
-            <div className="section-label"><span>06</span><p>The pink list</p></div>
-            <p className="mini-kicker">Will you be in our pink corner?</p>
-            <h2 id="rsvp-heading">Save your<br /><em>seat, lovely.</em></h2>
-            <p>Konfirmasi kehadiran agar kami bisa menyiapkan kursi, cake, dan sedikit magic khusus untukmu.</p>
-          </Reveal>
-          <Reveal><RSVPForm /></Reveal>
-        </section>
-
-        <section className="closing-section">
-          <Image src="/images/pink-raspberry-cake.jpg" alt="Kue pink berhias raspberry" fill sizes="100vw" />
+        <SectionReveal className="closing-section">
+          <Image src="/images/pink-raspberry-cake.jpg" alt="Artisanal pink cake topped with fresh raspberries" fill sizes="100vw" />
           <div className="closing-wash" aria-hidden="true" />
-          <Reveal className="closing-content">
+          <Reveal className="closing-content" delay={0.1}>
             <Sparkles size={24} aria-hidden="true" />
             <p className="mini-kicker">15 · 09 · 2026</p>
             <h2>Come for the bride,<br /><em>stay for the cake.</em></h2>
-            <p>Can&apos;t wait to celebrate with you.</p>
+            <p>Can&apos;t wait to celebrate with you!</p>
             <p className="signature">With love,<br /><strong>the girls</strong></p>
             <button type="button" className="glass-button" onClick={shareInvitation}>
-              <Share2 size={17} aria-hidden="true" /> Bagikan undangan
+              <Share2 size={17} aria-hidden="true" /> Share invitation
             </button>
             <span className="share-status" aria-live="polite">{shareStatus}</span>
           </Reveal>
           <footer>made with love, bows &amp; a suspicious amount of pink</footer>
-        </section>
+        </SectionReveal>
       </div>
 
       {surprise && (

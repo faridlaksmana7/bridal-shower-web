@@ -7,11 +7,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const rsvpSchema = z.object({
-  name: z.string().trim().min(2, "Masukkan nama lengkapmu."),
-  attendance: z.enum(["yes", "no"], { message: "Pilih konfirmasi kehadiran." }),
-  dietary: z.string().trim().max(180, "Maksimal 180 karakter."),
-  message: z.string().trim().max(300, "Maksimal 300 karakter."),
-  contact: z.string().trim().max(80, "Maksimal 80 karakter."),
+  name: z.string().trim().min(2, "Please enter your name."),
+  attendance: z.enum(["yes", "no"], { message: "Please select your attendance." }),
+  dietary: z.string().trim().max(180, "Maximum 180 characters."),
+  message: z.string().trim().max(300, "Maximum 300 characters."),
+  contact: z.string().trim().max(80, "Maximum 80 characters."),
   company: z.string().max(0, ""),
 });
 
@@ -33,7 +33,7 @@ export function LoveNotes() {
 
   return (
     <form className="note-form" onSubmit={submit}>
-      <label htmlFor="love-note">Tulis sesuatu yang ingin ia simpan selamanya…</label>
+      <label htmlFor="love-note">Write something she will cherish forever…</label>
       <textarea
         id="love-note"
         value={note}
@@ -41,18 +41,19 @@ export function LoveNotes() {
           setNote(event.target.value.slice(0, 280));
           setSaved(false);
         }}
+        placeholder="Share a memory, a warm wish, or a sweet secret…"
         rows={4}
         required
       />
       <div className="form-footer">
         <span>{note.length}/280</span>
         <button type="submit" className="dark-button">
-          Kirim dengan cinta <Heart size={16} aria-hidden="true" />
+          Send with love <Heart size={16} aria-hidden="true" />
         </button>
       </div>
-      <p className="local-note">Mode privat: catatan tersimpan hanya di perangkat ini.</p>
+      <p className="local-note">Private note: messages are stored locally on this device.</p>
       <p className="form-status" aria-live="polite">
-        {saved ? <><Check size={16} aria-hidden="true" /> Tersimpan—sealed with a pinky promise.</> : null}
+        {saved ? <><Check size={16} aria-hidden="true" /> Saved — sealed with a pinky promise.</> : null}
       </p>
     </form>
   );
@@ -87,39 +88,39 @@ export function RSVPForm() {
   return (
     <form className={`rsvp-form ${saved ? "is-success" : ""}`} onSubmit={submit} noValidate>
       <div className="field field-wide">
-        <label htmlFor="rsvp-name">Nama lengkap</label>
-        <input id="rsvp-name" autoComplete="name" aria-invalid={Boolean(errors.name)} {...register("name")} />
+        <label htmlFor="rsvp-name">Name</label>
+        <input id="rsvp-name" autoComplete="name" placeholder="Your full name" aria-invalid={Boolean(errors.name)} {...register("name")} />
         {errors.name && <span className="field-error">{errors.name.message}</span>}
       </div>
 
       <fieldset className="field field-wide attendance-field">
-        <legend>Akan hadir?</legend>
+        <legend>Are you coming ?</legend>
         <label className="choice-card">
           <input type="radio" value="yes" {...register("attendance")} />
-          <span>Yes, count me in!</span>
-          <small>Aku akan datang.</small>
+          <span>Absolutely wouldn’t miss it</span>
+          <small>Ready to celebrate with Shaula!</small>
         </label>
         <label className="choice-card">
           <input type="radio" value="no" {...register("attendance")} />
-          <span>Sending love from afar</span>
-          <small>Ikut merayakan dari jauh.</small>
+          <span>Can’t make it this time</span>
+          <small>Sending love and sweetest wishes from afar.</small>
         </label>
         {errors.attendance && <span className="field-error">{errors.attendance.message}</span>}
       </fieldset>
 
       <div className="field">
-        <label htmlFor="rsvp-contact">WhatsApp atau email <small>opsional</small></label>
-        <input id="rsvp-contact" autoComplete="tel" {...register("contact")} />
+        <label htmlFor="rsvp-contact">WhatsApp or email <small>optional</small></label>
+        <input id="rsvp-contact" autoComplete="tel" placeholder="For event updates" {...register("contact")} />
         {errors.contact && <span className="field-error">{errors.contact.message}</span>}
       </div>
       <div className="field">
-        <label htmlFor="rsvp-diet">Pantangan makanan <small>opsional</small></label>
-        <input id="rsvp-diet" {...register("dietary")} />
+        <label htmlFor="rsvp-diet">Dietary restrictions <small>optional</small></label>
+        <input id="rsvp-diet" placeholder="e.g. vegetarian, nut allergy" {...register("dietary")} />
         {errors.dietary && <span className="field-error">{errors.dietary.message}</span>}
       </div>
       <div className="field field-wide">
-        <label htmlFor="rsvp-message">Pesan untuk bride <small>opsional</small></label>
-        <textarea id="rsvp-message" rows={3} {...register("message")} />
+        <label htmlFor="rsvp-message">A sweet note for Shaula <small>optional</small></label>
+        <textarea id="rsvp-message" rows={3} placeholder="A little blessing or excitement…" {...register("message")} />
         {errors.message && <span className="field-error">{errors.message.message}</span>}
       </div>
       <div className="honeypot" aria-hidden="true">
@@ -127,14 +128,14 @@ export function RSVPForm() {
         <input id="company" tabIndex={-1} autoComplete="off" {...register("company")} />
       </div>
       <div className="form-submit field-wide">
-        <p>Preview mode · RSVP tersimpan hanya di perangkat ini.</p>
+        <p>Private RSVP · saved locally on this device.</p>
         <button type="submit" className="pink-button" disabled={isSubmitting}>
           {isSubmitting ? "Adding you to the pink list…" : "Seal my RSVP"}
           <Send size={16} aria-hidden="true" />
         </button>
       </div>
       <output className="rsvp-success" aria-live="polite">
-        {saved ? <><span>✓</span><strong>You&apos;re on the pink list!</strong><small>Sampai bertemu tanggal 15 September 2026.</small></> : null}
+        {saved ? <><span>✓</span><strong>You&apos;re on the pink list!</strong><small>See you on Tuesday, 15 September 2026 at Krema de Bruge.</small></> : null}
       </output>
     </form>
   );
