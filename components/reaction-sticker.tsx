@@ -12,27 +12,25 @@ type ReactionStickerProps = {
 };
 
 export function ReactionSticker({ src, frame, className, index, reduceMotion }: ReactionStickerProps) {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
+  const [failedFrames, setFailedFrames] = useState<Record<number, boolean>>({});
   const direction = index % 2 === 0 ? 1 : -1;
   const baseName = src.replace(/\.png$/, "").split("/").pop() || "back-left";
   const frameIndex = ((frame % 3) + 3) % 3;
-  const currentFrameSrc = `/images/reactions/extracted/${baseName}-frame-${frameIndex}.png`;
+  const currentFrameSrc = failedFrames[frameIndex]
+    ? src
+    : `/images/reactions/extracted/${baseName}-frame-${frameIndex}.png`;
 
   // Preload all 3 expression frames for this sticker so switching is instantaneous
   useEffect(() => {
     [0, 1, 2].forEach((f) => {
       const img = new window.Image();
       img.src = `/images/reactions/extracted/${baseName}-frame-${f}.png`;
-      if (f === frameIndex) {
-        if (img.complete) {
-          setLoaded(true);
-        } else {
-          img.onload = () => setLoaded(true);
-          img.onerror = () => setLoaded(true);
-        }
-      }
+      img.onerror = () => {
+        setFailedFrames((prev) => ({ ...prev, [f]: true }));
+      };
     });
-  }, [baseName, frameIndex]);
+  }, [baseName]);
 
   return (
     <motion.div
@@ -74,6 +72,10 @@ export function ReactionSticker({ src, frame, className, index, reduceMotion }: 
           width={300}
           height={360}
           onLoad={() => setLoaded(true)}
+          onError={() => {
+            setFailedFrames((prev) => ({ ...prev, [frameIndex]: true }));
+            setLoaded(true);
+          }}
           style={{
             display: "block",
             width: "100%",

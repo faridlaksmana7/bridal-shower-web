@@ -30,7 +30,7 @@ const alexBrush = Alex_Brush({
 
 export const metadata: Metadata = {
   title: "Surprise Bridal Shower for Shaula Putri — Pinky Promise",
-  description: "Please join us for a surprise bridal shower for Shaula Putri (Dimas & Shaula) · Tuesday, 15 September 2026 at Krema de Bruge.",
+  description: "Please join us for a surprise bridal shower for Shaula Putri (Yudistira & Shaula) · Tuesday, 15 September 2026 at Krema de Bruge.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pinky-promise-150926.jamess11.chatgpt.site"),
   robots: {
     index: false,

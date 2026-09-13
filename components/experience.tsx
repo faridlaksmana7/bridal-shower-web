@@ -139,7 +139,7 @@ function downloadCalendar() {
     `DTSTART;TZID=Asia/Jakarta:${day}T190000`,
     `DTEND;TZID=Asia/Jakarta:${day}T220000`,
     "SUMMARY:Surprise Bridal Shower for Shaula Putri",
-    "DESCRIPTION:Please join us for a surprise bridal shower for Shaula Putri (Dimas & Shaula Putri Andana) at Krema de Bruge.",
+    "DESCRIPTION:Please join us for a surprise bridal shower for Shaula Putri (Yudistira & Shaula Putri Andana) at Krema de Bruge.",
     "LOCATION:Krema de Bruge",
     "END:VEVENT",
     "END:VCALENDAR",
@@ -286,7 +286,7 @@ export function Experience() {
   async function shareInvitation() {
     const data = {
       title: "Surprise Bridal Shower for Shaula Putri",
-      text: "Please join us for a surprise bridal shower for Shaula Putri (Dimas & Shaula) · Tuesday, 15 September 2026 at Krema de Bruge",
+      text: "Please join us for a surprise bridal shower for Shaula Putri (Yudistira & Shaula) · Tuesday, 15 September 2026 at Krema de Bruge",
       url: window.location.href,
     };
     try {
@@ -381,7 +381,7 @@ export function Experience() {
               <p className="hero-script-tagline">She said yes for forever</p>
               <p className="hero-commemorate-text">
                 To celebrate and commemorate the milestone of<br />
-                <strong className="hero-couple-highlight">Dimas &amp; Shaula Putri Andana</strong>
+                <strong className="hero-couple-highlight">Yudistira &amp; Shaula Putri Andana</strong>
               </p>
             </div>
 
@@ -420,7 +420,7 @@ export function Experience() {
         </section>
 
         <div className="ticker" aria-hidden="true">
-          <div>SURPRISE BRIDAL SHOWER · SHAULA PUTRI · DIMAS &amp; SHAULA · 15.09.2026 · KREMA DE BRUGE · SHE SAID YES FOR FOREVER ·</div>
+          <div>SURPRISE BRIDAL SHOWER · SHAULA PUTRI · YUDISTIRA &amp; SHAULA · 15.09.2026 · KREMA DE BRUGE · SHE SAID YES FOR FOREVER ·</div>
         </div>
 
         <SectionReveal className="intro-section" id="details">
@@ -430,13 +430,13 @@ export function Experience() {
               <p className="mini-kicker">One unforgettable evening</p>
               <h2>To celebrate &amp; commemorate <em>their love.</em></h2>
               <p className="intro-body">
-                She said yes for forever! Dimas and Shaula Putri Andana are embarking on their forever journey,
+                She said yes for forever! Yudistira and Shaula Putri Andana are embarking on their forever journey,
                 and we&apos;re gathering her closest girls for a secret evening of laughter, cake, sweet memories, and happy tears.
               </p>
             </Reveal>
             <Reveal className="intro-photo-wrap" delay={0.14}>
               <figure className="intro-photo">
-                <Image src="/images/pink-bouquet-macro.jpg" alt="Editorial close up of romantic pink rose bouquet" fill sizes="(max-width: 767px) 84vw, 38vw" />
+                <Image src="/assets/Couple.png" alt="Yudistira &amp; Shaula Putri Andana" fill sizes="(max-width: 767px) 84vw, 38vw" />
               </figure>
               <p className="photo-note">come for the bride,<br />stay for the cake.</p>
             </Reveal>
