@@ -9,6 +9,7 @@ import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Countdown } from "@/components/countdown";
 import { LoveNotes, RSVPForm } from "@/components/forms";
+import { ReactionSticker } from "@/components/reaction-sticker";
 import { event, gallery, rundown, shades } from "@/src/data/event";
 
 const SatinCanvas = dynamic(
@@ -22,6 +23,14 @@ const reveal = {
 };
 
 const stickerPositions = ["0% 0%", "50% 0%", "100% 0%", "0% 100%", "50% 100%", "100% 100%"];
+const reactionStickers = [
+  { src: "/images/reactions/back-left.png", className: "gate-reaction-one" },
+  { src: "/images/reactions/back-center.png", className: "gate-reaction-two" },
+  { src: "/images/reactions/back-right.png", className: "gate-reaction-three" },
+  { src: "/images/reactions/front-left.png", className: "gate-reaction-four" },
+  { src: "/images/reactions/front-center.png", className: "gate-reaction-five" },
+  { src: "/images/reactions/front-right.png", className: "gate-reaction-six" },
+];
 
 function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const reduceMotion = useReducedMotion();
@@ -74,6 +83,8 @@ export function Experience() {
   const [bowTaps, setBowTaps] = useState(0);
   const [shareStatus, setShareStatus] = useState("");
   const [canvasActive, setCanvasActive] = useState(true);
+  const [reactionFrame, setReactionFrame] = useState(0);
+  const gateRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -126,6 +137,14 @@ export function Experience() {
   }, [opened]);
 
   useEffect(() => {
+    if (reduceMotion || opened) return;
+    const timer = window.setInterval(() => {
+      setReactionFrame((current) => (current + 1) % 3);
+    }, 1450);
+    return () => window.clearInterval(timer);
+  }, [opened, reduceMotion]);
+
+  useEffect(() => {
     const hero = document.querySelector(".hero");
     if (!hero) return;
     const observer = new IntersectionObserver(([entry]) => setCanvasActive(entry.isIntersecting), { rootMargin: "120px" });
@@ -144,6 +163,20 @@ export function Experience() {
       setGateGone(true);
       heroTitleRef.current?.focus();
     }, reduceMotion ? 30 : 1000);
+  }
+
+  function moveGateReactions(event: React.PointerEvent<HTMLElement>) {
+    if (reduceMotion || !gateRef.current) return;
+    const bounds = gateRef.current.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width - .5) * 12;
+    const y = ((event.clientY - bounds.top) / bounds.height - .5) * 9;
+    gateRef.current.style.setProperty("--gate-x", `${x}px`);
+    gateRef.current.style.setProperty("--gate-y", `${y}px`);
+  }
+
+  function resetGateReactions() {
+    gateRef.current?.style.setProperty("--gate-x", "0px");
+    gateRef.current?.style.setProperty("--gate-y", "0px");
   }
 
   function scrollTo(id: string) {
@@ -188,16 +221,31 @@ export function Experience() {
 
       {!gateGone && (
         <section
+          ref={gateRef}
           className={`invitation-gate ${opened ? "is-open" : ""}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="gate-title"
+          onPointerMove={moveGateReactions}
+          onPointerLeave={resetGateReactions}
         >
           <div className="gate-grain" aria-hidden="true" />
           <div className="gate-orbit gate-orbit-one" aria-hidden="true" />
           <div className="gate-orbit gate-orbit-two" aria-hidden="true" />
           <p className="gate-kicker">A little something lovely has arrived</p>
           <div className="gate-card">
+            <div className="gate-reactions" aria-hidden="true">
+              {reactionStickers.map((sticker, index) => (
+                <ReactionSticker
+                  key={sticker.src}
+                  src={sticker.src}
+                  className={sticker.className}
+                  index={index}
+                  frame={(reactionFrame + index) % 3}
+                  reduceMotion={Boolean(reduceMotion)}
+                />
+              ))}
+            </div>
             <p className="gate-for">Khusus untuk</p>
             <h2 className="gate-guest" id="gate-title">{guestName}</h2>
             <span className="gate-rule" aria-hidden="true" />
@@ -211,6 +259,7 @@ export function Experience() {
               Buka undangannya <span aria-hidden="true">↗</span>
             </button>
             <p className="gate-note">open the pink envelope</p>
+            <p className="reaction-caption"><span>6 besties</span><i />18 little moods</p>
           </div>
         </section>
       )}

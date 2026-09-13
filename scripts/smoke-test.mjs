@@ -5,6 +5,12 @@ const requiredAssets = [
   "public/images/hero-pink-tablescape.jpg",
   "public/images/the-girls.png",
   "public/images/the-girls-stickers.png",
+  "public/images/reactions/back-left.png",
+  "public/images/reactions/back-center.png",
+  "public/images/reactions/back-right.png",
+  "public/images/reactions/front-left.png",
+  "public/images/reactions/front-center.png",
+  "public/images/reactions/front-right.png",
   "public/images/pink-raspberry-cake.jpg",
   "public/images/pink-bouquet-macro.jpg",
   "public/images/garden-party-table.jpg",
@@ -20,6 +26,7 @@ const styleSource = await readFile("app/globals.css", "utf8");
 
 assert.match(eventSource, /2026-09-15/, "Event date must remain 15 September 2026");
 assert.match(experienceSource, /SatinCanvas/, "WebGL layer must be present");
+assert.match(experienceSource, /ReactionSticker/, "Opening reaction stickers must be present");
 assert.match(formsSource, /Seal my RSVP/, "RSVP flow must be present");
 assert.match(styleSource, /the-girls-stickers/, "Sticker experience must be present");
 
