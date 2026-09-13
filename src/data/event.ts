@@ -30,9 +30,9 @@ export const rundown = [
 
 export const gallery = [
   {
-    src: "/images/bridal-party-pink-robes.jpg",
-    alt: "Sekelompok sahabat merayakan bersama dalam balutan warna pink",
-    caption: "our forever favorites",
+    src: "/images/the-girls.png",
+    alt: "Enam sahabat berpose bersama dalam ruangan bernuansa pink",
+    caption: "the girls in her pink corner",
     ratio: "portrait",
   },
   {

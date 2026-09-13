@@ -58,8 +58,8 @@ function SatinPlane({ accent, opened }: { accent: string; opened: boolean }) {
     () => ({
       uTime: { value: 0 },
       uPointer: { value: new THREE.Vector2(0, 0) },
-      uAccent: { value: new THREE.Color(accent) },
-      uOpened: { value: opened ? 1 : 0 },
+      uAccent: { value: new THREE.Color("#ff8fbd") },
+      uOpened: { value: 0 },
     }),
     [],
   );

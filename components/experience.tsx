@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { CalendarPlus, ChevronDown, Gift, Heart, Share2, Sparkles } from "lucide-react";
+import { CalendarPlus, ChevronDown, Gift, Share2, Sparkles } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Lenis from "lenis";
 import type { CSSProperties } from "react";
@@ -20,6 +20,8 @@ const reveal = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
+
+const stickerPositions = ["0% 0%", "50% 0%", "100% 0%", "0% 100%", "50% 100%", "100% 100%"];
 
 function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const reduceMotion = useReducedMotion();
@@ -80,7 +82,10 @@ export function Experience() {
   useEffect(() => {
     const raw = new URLSearchParams(window.location.search).get("to");
     const clean = raw?.replace(/[<>]/g, "").trim().slice(0, 48);
-    if (clean) setGuestName(clean);
+    const frame = window.requestAnimationFrame(() => {
+      if (clean) setGuestName(clean);
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -98,7 +103,7 @@ export function Experience() {
     if (reduceMotion) return;
     const lenis = new Lenis({ duration: 1.05, smoothWheel: true, syncTouch: false });
     lenisRef.current = lenis;
-    if (!opened) lenis.stop();
+    lenis.stop();
     let raf = 0;
     const loop = (time: number) => {
       lenis.raf(time);
@@ -117,6 +122,7 @@ export function Experience() {
 
   useEffect(() => {
     if (opened) lenisRef.current?.start();
+    else lenisRef.current?.stop();
   }, [opened]);
 
   useEffect(() => {
@@ -299,12 +305,30 @@ export function Experience() {
           </Reveal>
         </section>
 
-        <section className="gallery-section" aria-labelledby="gallery-heading">
+        <section className="gallery-section" id="gallery" aria-labelledby="gallery-heading">
           <Reveal className="gallery-heading">
             <div className="section-label light"><span>02</span><p>Camera roll incoming</p></div>
             <h2 id="gallery-heading">The Bride<br /><em>Appreciation Club.</em></h2>
             <p>Swipe pelan-pelan—setiap frame datang dengan sedikit main character energy.</p>
           </Reveal>
+          <div className="sticker-stage" aria-hidden="true">
+            <div className="sticker-copy">
+              <span>six girls</span>
+              <strong>one pink corner</strong>
+              <i>୨୧</i>
+            </div>
+            {stickerPositions.map((position, index) => (
+              <motion.div
+                key={position}
+                className={`face-sticker face-sticker-${index + 1}`}
+                style={{ backgroundPosition: position }}
+                initial={reduceMotion ? false : { opacity: 0, y: 70, scale: .72, rotate: index % 2 ? 13 : -13 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1, rotate: index % 2 ? 4 : -4 }}
+                viewport={{ once: true, amount: .3 }}
+                transition={{ duration: .72, delay: index * .085, ease: [.16, 1, .3, 1] }}
+              />
+            ))}
+          </div>
           <div className="gallery-track" aria-label="Galeri foto bridal shower">
             {gallery.map((item, index) => (
               <motion.figure

@@ -135,6 +135,19 @@ h2 em { color: var(--rose); font-weight: 300; }
 .gallery-heading h2 { margin: 0; font-family: var(--font-display); font-size: clamp(3.6rem, 16vw, 8rem); font-weight: 480; letter-spacing: -.06em; line-height: .81; }
 .gallery-heading h2 em { color: #ffb9d4; }
 .gallery-heading > p { max-width: 440px; margin: 28px 0 0; color: rgb(255 249 248 / 72%); font-family: var(--font-display); font-size: 1rem; line-height: 1.55; }
+.sticker-stage { position: relative; height: 510px; margin: 38px 20px 10px; overflow: hidden; border: 1px solid rgb(255 255 255 / 17%); border-radius: 28px; background: radial-gradient(circle at 50% 50%, rgb(243 53 140 / 28%), transparent 43%), linear-gradient(145deg, #391021, #701b43); box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%); }
+.sticker-stage::before { position: absolute; inset: 12px; border: 1px dashed rgb(255 255 255 / 20%); border-radius: 20px; content: ""; }
+.sticker-copy { position: absolute; z-index: 1; top: 50%; left: 50%; display: grid; justify-items: center; width: 180px; transform: translate(-50%, -50%) rotate(-4deg); text-align: center; }
+.sticker-copy span { font-size: .63rem; font-weight: 850; letter-spacing: .18em; text-transform: uppercase; }
+.sticker-copy strong { color: #ffd3e4; font-family: var(--font-display); font-size: 2rem; font-style: italic; font-weight: 420; line-height: .92; }
+.sticker-copy i { margin-top: 7px; color: #ff8fbd; font-family: var(--font-display); font-size: 1.9rem; }
+.face-sticker { position: absolute; width: 122px; aspect-ratio: .64; background-image: url("/images/the-girls-stickers.png?v=2"); background-repeat: no-repeat; background-size: 300% 200%; filter: drop-shadow(0 16px 17px rgb(21 0 9 / 32%)); will-change: transform; }
+.face-sticker-1 { top: -8px; left: -9px; }.face-sticker-2 { top: 8px; left: calc(50% - 61px); }.face-sticker-3 { top: -4px; right: -8px; }
+.face-sticker-4 { bottom: -18px; left: -3px; }.face-sticker-5 { bottom: -12px; left: calc(50% - 61px); }.face-sticker-6 { right: -5px; bottom: -18px; }
+.face-sticker:nth-of-type(odd) { animation: sticker-float-a 4.4s ease-in-out infinite alternate; }
+.face-sticker:nth-of-type(even) { animation: sticker-float-b 5.1s .3s ease-in-out infinite alternate; }
+@keyframes sticker-float-a { to { translate: 0 -7px; rotate: 2deg; } }
+@keyframes sticker-float-b { to { translate: 0 8px; rotate: -2deg; } }
 .gallery-track { display: flex; gap: 18px; margin-top: 54px; padding: 0 20px 28px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-inline: contain; }
 .gallery-track::-webkit-scrollbar { display: none; }
 .gallery-card { flex: 0 0 80vw; max-width: 390px; margin: 0; scroll-snap-align: center; }
@@ -254,6 +267,11 @@ h2 em { color: var(--rose); font-weight: 300; }
   .date-content { max-width: 590px; }
   .gallery-section { padding: 130px 7vw 145px; }
   .gallery-heading { padding: 0; }
+  .sticker-stage { height: 470px; margin: 60px 0 15px; }
+  .face-sticker { width: 170px; }
+  .face-sticker-1 { top: 5px; left: 3%; }.face-sticker-2 { top: -18px; left: 22%; }.face-sticker-3 { top: 2px; right: 24%; }
+  .face-sticker-4 { bottom: -20px; left: 11%; }.face-sticker-5 { bottom: -12px; left: 41%; }.face-sticker-6 { right: 7%; bottom: -18px; }
+  .sticker-copy { width: 240px; }.sticker-copy strong { font-size: 3.1rem; }
   .gallery-track { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.3vw; margin-top: 70px; padding: 0; overflow: visible; }
   .gallery-card { max-width: none; }.gallery-card-2 { margin-top: 100px; }.gallery-card-3 { margin-top: -42px; }
   .rundown-section { grid-template-columns: .9fr 1.1fr; gap: 8vw; align-items: start; }

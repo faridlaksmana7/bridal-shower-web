@@ -11,4 +11,4 @@ All downloaded stock images are stored locally under `public/images`. Attributio
 | `pink-bouquet-macro.jpg` | Tom Kulczycki | [Unsplash](https://unsplash.com/photos/pink-petaled-flower-bouquet-close-up-photography-IilKsqAemf4) | [Unsplash License](https://unsplash.com/license) |
 | `garden-party-table.jpg` | Volodymyr Lymariev | [Unsplash](https://unsplash.com/photos/white-table-and-chairs-with-pink-flowers-in-a-garden-7AG36dnF_E0) | [Unsplash License](https://unsplash.com/license) |
 
-The social preview image `public/og.png` was created specifically for this invitation with OpenAI ImageGen.
+`public/images/the-girls.png` is the user-supplied personal group photo. `public/images/the-girls-stickers.png` is an identity-preserving sticker-sheet edit derived from that photo with OpenAI ImageGen. The social preview image `public/og.png` was also created specifically for this invitation with OpenAI ImageGen.
